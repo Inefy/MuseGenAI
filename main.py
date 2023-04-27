@@ -5,10 +5,10 @@ from mido import Message, MidiFile, MidiTrack
 # Initialize OpenAI API (replace 'your_api_key' with your actual API key)
 openai.api_key = 'your_api_key'
 
-# Function to generate music notation using GPT-4
-def generate_music_notation(prompt, num_notes, temperature):
+# Function to generate music notation using the selected GPT engine
+def generate_music_notation(engine_name, prompt, num_notes, temperature):
     response = openai.Completion.create(
-        engine="text-davinci-002",
+        engine=engine_name,
         prompt=prompt,
         max_tokens=num_notes * 5,
         n=1,
@@ -35,15 +35,23 @@ def notation_to_midi(notation, output_file):
     midi.save(output_file)
 
 # User input for parameters
+engine_choice = input("Choose the GPT engine (gpt-4, gpt-3, gpt-3-turbo): ")
 style = input("Enter the desired style (e.g., classical, jazz, pop): ")
 genre = input("Enter the desired genre (e.g., upbeat, melancholic, energetic): ")
 key = input("Enter the desired key (e.g., C major, A minor): ")
 num_notes = int(input("Enter the number of notes in the melody: "))
 temperature = float(input("Enter the creativity level (0.1-1.0, higher is more creative): "))
 
+# Set engine name based on user input
+engine_name = {
+    "gpt-4": "text-davinci-002",
+    "gpt-3": "davinci",
+    "gpt-3-turbo": "davinci-codex",
+}.get(engine_choice.lower(), "text-davinci-002")  # Default to GPT-4 if input is not recognized
+
 # Generate music notation
 prompt = f"Generate a {style} {genre} piano melody in the key of {key}:"
-notation = generate_music_notation(prompt, num_notes, temperature)
+notation = generate_music_notation(engine_name, prompt, num_notes, temperature)
 
 # Convert music notation to MIDI
 output_file = 'output.mid'
