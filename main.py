@@ -20,11 +20,12 @@ def generate_music_notation(engine_name, prompt, num_notes, temperature):
     return response.choices[0].text.strip().split('\n')
 
 # Function to convert music notation to MIDI
-def notation_to_midi(notation, output_file):
+def notation_to_midi(notation, output_file, tempo):
     midi = pretty_midi.PrettyMIDI()
     piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
     piano = pretty_midi.Instrument(program=piano_program)
     midi.instruments.append(piano)
+    midi.adjust_times([0], [60 / tempo])
 
     time = 0
     for line in notation:
@@ -49,6 +50,7 @@ genre = input("Enter the desired genre (e.g., upbeat, melancholic, energetic): "
 key = input("Enter the desired key (e.g., C major, A minor): ")
 num_notes = int(input("Enter the number of notes in the melody: "))
 temperature = float(input("Enter the creativity level (0.1-1.0, higher is more creative): "))
+tempo = int(input("Enter the desired tempo in BPM: "))
 
 # Set engine name based on user input
 engine_name = {
@@ -58,10 +60,10 @@ engine_name = {
 }.get(engine_choice.lower(), "gpt-3.5-turbo")  # Default to GPT-3 Turbo (gpt-3.5-turbo) if input is not recognized
 
 # Generate music notation
-prompt = f"Generate a {style} {genre} piano melody with individual notes in the key of {key}. Provide the melody in the following format: 'duration pitch', with each note on a separate line."
+prompt = f"Generate a {style} {genre} piano melody with individual notes in the key of {key} at {tempo} BPM. Provide the melody in the following format: 'duration pitch', with each note on a separate line."
 notation = generate_music_notation(engine_name, prompt, num_notes, temperature)
 
 # Convert music notation to MIDI
 output_file = 'output.mid'
-notation_to_midi(notation, output_file)
+notation_to_midi(notation, output_file, tempo)
 print(f"MIDI file generated: {output_file}")
