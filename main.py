@@ -1,9 +1,10 @@
 import openai
+import config
 import mido
 from mido import Message, MidiFile, MidiTrack
 
 # Initialize OpenAI API (replace 'your_api_key' with your actual API key)
-openai.api_key = 'your_api_key'
+openai.api_key = config.API_KEY
 
 # Function to generate music notation using the selected GPT engine
 def generate_music_notation(engine_name, prompt, num_notes, temperature):
