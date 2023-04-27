@@ -1,7 +1,6 @@
 import openai
 import config
-import mido
-from mido import Message, MidiFile, MidiTrack
+import pretty_midi
 import fractions
 
 # Initialize OpenAI API (replace 'your_api_key' with your actual API key)
@@ -22,25 +21,26 @@ def generate_music_notation(engine_name, prompt, num_notes, temperature):
 
 # Function to convert music notation to MIDI
 def notation_to_midi(notation, output_file):
-    midi = MidiFile()
-    track = MidiTrack()
-    midi.tracks.append(track)
+    midi = pretty_midi.PrettyMIDI()
+    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
+    piano = pretty_midi.Instrument(program=piano_program)
+    midi.instruments.append(piano)
 
+    time = 0
     for line in notation:
         try:
             duration, pitch = line.split()
             duration = round(4 * float(fractions.Fraction(duration)))
-            note = mido.note_name_to_int(pitch)
-            track.append(Message('note_on', note=note, velocity=64, time=0))
-            track.append(Message('note_off', note=note, velocity=64, time=int(480 * (4 / duration))))
+            note = pretty_midi.note_name_to_number(pitch)
+
+            note_on = pretty_midi.Note(velocity=64, pitch=note, start=time, end=time + (4 / duration))
+            piano.notes.append(note_on)
+
+            time += (4 / duration)
         except ValueError:
             print(f"Skipping line: {line}")
-        except mido.KeySignatureError:
-            print(f"Skipping line due to an invalid pitch: {line}")
 
-    midi.save(output_file)
-
-
+    midi.write(output_file)
 
 # User input for parameters
 engine_choice = input("Choose the GPT engine (gpt-4, gpt-3, gpt-3-turbo): ")
