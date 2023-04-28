@@ -10,7 +10,7 @@ def generate_midi():
     genre = genre_entry.get()
     instrument_name = instrument_combo.get()
     num_notes = int(notes_entry.get())
-    temperature = float(temperature_entry.get())
+    temperature = temperature_scale.get()
 
     engine_name = {
         "gpt-4": "gpt-4",
@@ -32,7 +32,7 @@ root.title("Music Generator")
 # Create and place UI elements
 ttk.Label(root, text="Engine:").grid(column=0, row=0, sticky=tk.W)
 engine_combo = ttk.Combobox(root, values=["gpt-4", "gpt-3", "gpt-3-turbo"])
-engine_combo.set("gpt-3-turbo")
+engine_combo.set("gpt-3")
 engine_combo.grid(column=1, row=0)
 
 ttk.Label(root, text="Style:").grid(column=0, row=1, sticky=tk.W)
@@ -53,8 +53,9 @@ notes_entry = ttk.Entry(root)
 notes_entry.grid(column=1, row=4)
 
 ttk.Label(root, text="Creativity level:").grid(column=0, row=5, sticky=tk.W)
-temperature_entry = ttk.Entry(root)
-temperature_entry.grid(column=1, row=5)
+temperature_scale = tk.Scale(root, from_=0.1, to=1.0, resolution=0.1, orient=tk.HORIZONTAL)
+temperature_scale.set(0.5)
+temperature_scale.grid(column=1, row=5)
 
 generate_button = ttk.Button(root, text="Generate MIDI", command=generate_midi)
 generate_button.grid(column=1, row=6)
