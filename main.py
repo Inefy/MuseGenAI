@@ -11,7 +11,7 @@ def generate_music_notation(engine_name, prompt, num_notes, temperature):
     response = openai.Completion.create(
         engine=engine_name,
         prompt=prompt,
-        max_tokens=num_notes * 5,
+        max_tokens=num_notes * 3,
         n=1,
         stop=None,
         temperature=temperature,
@@ -31,10 +31,14 @@ def notation_to_midi(notation, output_file):
         try:
             split_line = line.split()
             duration = round(4 * float(fractions.Fraction(split_line[0])))
+            if duration == 0:
+                print(f"Skipping line due to zero duration: {line}")
+                continue
+
             pitches = [pretty_midi.note_name_to_number(pitch) for pitch in split_line[1:]]
 
             for pitch in pitches:
-                note_on = pretty_midi.Note(velocity=64, pitch=pitch, start=time, end=time + (4 / duration))
+                note_on = pretty_midi.Note(velocity=64, pitch=pitch, start=time, end=time + (1 / duration))
                 piano.notes.append(note_on)
 
             time += (4 / duration)
@@ -42,7 +46,6 @@ def notation_to_midi(notation, output_file):
             print(f"Skipping line: {line}")
 
     midi.write(output_file)
-
 
 # User input for parameters
 engine_choice = input("Choose the GPT engine (gpt-4, gpt-3, gpt-3-turbo): ")
