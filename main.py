@@ -41,7 +41,7 @@ def notation_to_midi(notation, output_file):
                 note_on = pretty_midi.Note(velocity=64, pitch=pitch, start=time, end=time + (1 / duration))
                 piano.notes.append(note_on)
 
-            time += (4 / duration)
+            time += (1 / duration)
         except ValueError:
             print(f"Skipping line: {line}")
 
