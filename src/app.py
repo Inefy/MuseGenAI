@@ -1,11 +1,10 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 import main
 import os
 import tempfile
 import openai
 import pretty_midi
-import jsonify
 import config
 
 # Initialize OpenAI API (replace 'your_api_key' with your actual API key)
@@ -16,8 +15,10 @@ CORS(app)
 
 @app.route('/instruments', methods=['GET'])
 def get_instruments():
-    instruments = [{"id": id, "name": name} for id, name in pretty_midi.INSTRUMENT_MAP.items()]
+    instruments = [{"id": index, "name": name} for index, name in enumerate(pretty_midi.INSTRUMENT_MAP)]
     return jsonify(instruments)
+
+
 
 
 @app.route('/generate-midi', methods=['POST'])
