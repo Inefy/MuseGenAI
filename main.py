@@ -7,18 +7,10 @@ import fractions
 openai.api_key = config.API_KEY
 
 # Function to generate music notation using the selected GPT engine
+
+
 def generate_music_notation(engine_name, prompt, num_notes, temperature):
-    if engine_name == "gpt-4":
-        response = openai.ChatCompletion.create(
-            model=engine_name,
-            messages=[{"role": "system", "content": "You are a music generator AI."}, {"role": "user", "content": prompt}],
-            max_tokens=num_notes * 3,
-            n=1,
-            stop=None,
-            temperature=temperature,
-        )
-        notation = response.choices[0].message['content'].strip().split('\n')
-    else:
+    if engine_name == "gpt-3":
         response = openai.Completion.create(
             engine=engine_name,
             prompt=prompt,
@@ -28,8 +20,21 @@ def generate_music_notation(engine_name, prompt, num_notes, temperature):
             temperature=temperature,
         )
         notation = response.choices[0].text.strip().split('\n')
+    else:
+        response = openai.ChatCompletion.create(
+            model=engine_name,
+            messages=[{"role": "system", "content": "You are a music generator AI."}, {
+                "role": "user", "content": prompt}],
+            max_tokens=num_notes * 3,
+            n=1,
+            stop=None,
+            temperature=temperature,
+        )
+        notation = response.choices[0]['message']['content'].strip().split(
+            '\n')
 
     return notation
+
 
 # Function to convert music notation to MIDI
 def notation_to_midi(notation, output_file, instrument_name):
@@ -42,7 +47,12 @@ def notation_to_midi(notation, output_file, instrument_name):
     for line in notation:
         try:
             split_line = line.split()
+            if len(split_line) < 2:
+                print(f"Skipping line due to insufficient elements: {line}")
+                continue
+
             duration = round(4 * float(fractions.Fraction(split_line[0])))
+
             if duration == 0:
                 print(f"Skipping line due to zero duration: {line}")
                 continue
