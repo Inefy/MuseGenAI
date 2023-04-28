@@ -46,28 +46,3 @@ def notation_to_midi(notation, output_file, instrument_name):
             print(f"Skipping line: {line}")
 
     midi.write(output_file)
-
-# User input for parameters
-engine_choice = input("Choose the GPT engine (gpt-4, gpt-3, gpt-3-turbo): ")
-style = input("Enter the desired style (e.g., classical, jazz, pop): ")
-genre = input("Enter the desired genre (e.g., upbeat, melancholic, energetic): ")
-instrument_name = input("Enter the desired instrument (e.g., Acoustic Grand Piano, Violin, Flute): ")
-num_notes = int(input("Enter the number of notes in the melody: "))
-temperature = float(input("Enter the creativity level (0.1-1.0, higher is more creative): "))
-output_file = input("Enter the desired output filename (e.g., my_song.mid): ")
-
-# Set engine name based on user input
-engine_name = {
-    "gpt-4": "gpt-4",
-    "gpt-3": "text-davinci-003",
-    "gpt-3-turbo": "gpt-3.5-turbo",
-}.get(engine_choice.lower(), "gpt-3.5-turbo")  # Default to GPT-3 Turbo (gpt-3.5-turbo) if input is not recognized
-
-# Generate music notation
-prompt = f"Generate a {style} {genre} {instrument_name} song with individual notes and chords. Provide the melody in the following format: 'duration pitch1 pitch2 ...', with each note or chord on a separate line."
-
-notation = generate_music_notation(engine_name, prompt, num_notes, temperature)
-
-# Convert music notation to MIDI
-notation_to_midi(notation, output_file, instrument_name)
-print(f"MIDI file generated: {output_file}")
