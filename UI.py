@@ -2,12 +2,13 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import main
+import pretty_midi
 
 def generate_midi():
     engine_choice = engine_combo.get()
     style = style_entry.get()
     genre = genre_entry.get()
-    instrument_name = instrument_entry.get()
+    instrument_name = instrument_combo.get()
     num_notes = int(notes_entry.get())
     temperature = float(temperature_entry.get())
 
@@ -43,8 +44,9 @@ genre_entry = ttk.Entry(root)
 genre_entry.grid(column=1, row=2)
 
 ttk.Label(root, text="Instrument:").grid(column=0, row=3, sticky=tk.W)
-instrument_entry = ttk.Entry(root)
-instrument_entry.grid(column=1, row=3)
+instrument_combo = ttk.Combobox(root, values=pretty_midi.INSTRUMENT_MAP)
+instrument_combo.set("Acoustic Grand Piano")
+instrument_combo.grid(column=1, row=3)
 
 ttk.Label(root, text="Number of notes:").grid(column=0, row=4, sticky=tk.W)
 notes_entry = ttk.Entry(root)
