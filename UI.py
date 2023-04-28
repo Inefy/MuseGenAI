@@ -18,7 +18,8 @@ def generate_midi():
         "gpt-3-turbo": "gpt-3.5-turbo",
     }.get(engine_choice.lower(), "gpt-3.5-turbo")
 
-    prompt = f"Generate a {style} {genre} {instrument_name} song with individual notes and chords. Provide the melody in the following format: 'duration pitch1 pitch2 ...', with each note or chord on a separate line."
+    # Updated prompt string with correct positions for style and genre
+    prompt = f"Generate a {genre} {style} {instrument_name} song with individual notes and chords. Provide the melody in the following format: 'duration pitch1 pitch2 ...', with each note or chord on a separate line."
 
     notation = main.generate_music_notation(engine_name, prompt, num_notes, temperature)
     output_file = filedialog.asksaveasfilename(defaultextension=".mid")
