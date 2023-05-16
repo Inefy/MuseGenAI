@@ -12,7 +12,10 @@
 /build
 
 # misc
+<<<<<<< HEAD
 src/config.py   
+=======
+>>>>>>> react
 .DS_Store
 .env.local
 .env.development.local
