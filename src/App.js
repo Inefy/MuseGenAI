@@ -43,7 +43,6 @@ function App() {
 
   useEffect(() => {
     const fetchInstruments = async () => {
-      // Replace this URL with the API endpoint of your Python backend
       const apiUrl = "http://localhost:5000/instruments";
       const response = await axios.get(apiUrl);
       setInstrumentsList(response.data);
@@ -53,7 +52,6 @@ function App() {
   }, []);
 
   const generateMidi = async () => {
-    // Replace this URL with the API endpoint of your Python backend
     const apiUrl = "http://localhost:5000/generate-midi";
 
     const response = await axios.post(apiUrl, {
