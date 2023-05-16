@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
-import { Container, Box, Typography, TextField, Select, MenuItem, FormControl, InputLabel, Slider, Button } from "@mui/material";
+import { Container, Box, Typography, TextField, Select, MenuItem, FormControl, InputLabel, Slider, Button, Checkbox, ListItemText } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import styled from "@emotion/styled";
 
@@ -35,7 +35,7 @@ function App() {
   const [engine, setEngine] = useState("gpt-3");
   const [style, setStyle] = useState("");
   const [genre, setGenre] = useState("");
-  const [instrument, setInstrument] = useState("Acoustic Grand Piano");
+  const [instruments, setInstruments] = useState([]);
   const [numNotes, setNumNotes] = useState("");
   const [temperature, setTemperature] = useState(0.5);
 
@@ -60,7 +60,7 @@ function App() {
       engine,
       style,
       genre,
-      instrument,
+      instruments,
       num_notes: numNotes,
       temperature,
     });
@@ -99,11 +99,18 @@ function App() {
         </Box>
         <Box width="100%" mb={3}>
           <FormControl fullWidth>
-            <InputLabel>Instrument</InputLabel>
-            <Select value={instrument} onChange={(e) => setInstrument(e.target.value)}>
+            <InputLabel id="instruments-label">Instruments</InputLabel>
+            <Select
+              labelId="instruments-label"
+              multiple
+              value={instruments}
+              onChange={(e) => setInstruments(e.target.value)}
+              renderValue={(selected) => selected.join(', ')}
+            >
               {instrumentsList.map((instr) => (
                 <MenuItem key={instr.id} value={instr.name}>
-                  {instr.name}
+                  <Checkbox checked={instruments.indexOf(instr.name) > -1} />
+                  <ListItemText primary={instr.name} />
                 </MenuItem>
               ))}
             </Select>
@@ -134,7 +141,6 @@ function App() {
       </AppContainer>
     </ThemeProvider>
   );
-
 }
 
 export default App;
