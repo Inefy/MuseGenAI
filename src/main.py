@@ -10,6 +10,7 @@ openai.api_key = config.API_KEY
 def clean_instrument_name(instrument_name):
     return re.sub(r'\s*\(.*?\)', '', instrument_name)
 
+
 def generate_music_notation(engine_name, prompt, num_notes, temperature, instruments):
     notations = []
     for instrument_name in instruments:
@@ -17,6 +18,7 @@ def generate_music_notation(engine_name, prompt, num_notes, temperature, instrum
         notation = _generate_music_notation(engine_name, instrument_prompt, num_notes, temperature)
         notations.append(notation)
     return notations
+
 
 def _generate_music_notation(engine_name, prompt, num_notes, temperature):
     notation = []
@@ -36,7 +38,8 @@ def _generate_music_notation(engine_name, prompt, num_notes, temperature):
         else:
             response = openai.ChatCompletion.create(
                 model=engine_name,
-                messages=[{"role": "system", "content": "You are a music generator AI."}, {"role": "user", "content": prompt}],
+                messages=[{"role": "system", "content": "You are a music generator AI."}, {
+                    "role": "user", "content": prompt}],
                 max_tokens=min(tokens_per_request, (num_notes - len(notation)) * 5),
                 n=1,
                 stop=None,
@@ -50,6 +53,7 @@ def _generate_music_notation(engine_name, prompt, num_notes, temperature):
     notation = notation[:num_notes]
 
     return notation
+
 
 def notation_to_midi(notations, output_file, instrument_names):
     midi = pretty_midi.PrettyMIDI()
