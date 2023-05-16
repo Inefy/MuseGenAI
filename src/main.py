@@ -3,15 +3,27 @@ import config
 import pretty_midi
 import fractions
 import re
+import logging
 
-# Initialize OpenAI API (replace 'your_api_key' with your actual API key)
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+# Initialize OpenAI API with a configurable API key
 openai.api_key = config.API_KEY
 
 def clean_instrument_name(instrument_name):
+    """
+    Clean instrument name by removing content within parentheses.
+    """
     return re.sub(r'\s*\(.*?\)', '', instrument_name)
 
-
 def generate_music_notation(engine_name, prompt, num_notes, temperature, instruments):
+    """
+    Generate music notation for the given set of instruments.
+    """
+    if not instruments:
+        raise ValueError("Instruments cannot be empty")
+
     notations = []
     for instrument_name in instruments:
         instrument_prompt = f"{prompt} {instrument_name}:"
@@ -19,43 +31,51 @@ def generate_music_notation(engine_name, prompt, num_notes, temperature, instrum
         notations.append(notation)
     return notations
 
-
 def _generate_music_notation(engine_name, prompt, num_notes, temperature):
+    """
+    Generate music notation using the OpenAI API.
+    """
     notation = []
     tokens_per_request = 1000  # Adjust this value based on the maximum tokens you want to request in one call
 
     while len(notation) < num_notes:
-        if engine_name == "gpt-3":
-            response = openai.Completion.create(
-                engine=engine_name,
-                prompt=prompt,
-                max_tokens=min(tokens_per_request, (num_notes - len(notation)) * 5),
-                n=1,
-                stop=None,
-                temperature=temperature,
-            )
-            new_notation = response.choices[0].text.strip().split('\n')
-        else:
-            response = openai.ChatCompletion.create(
-                model=engine_name,
-                messages=[{"role": "system", "content": "You are a music generator AI."}, {
-                    "role": "user", "content": prompt}],
-                max_tokens=min(tokens_per_request, (num_notes - len(notation)) * 5),
-                n=1,
-                stop=None,
-                temperature=temperature,
-            )
-            new_notation = response.choices[0]['message']['content'].strip().split('\n')
+        try:
+            if engine_name == "gpt-3":
+                response = openai.Completion.create(
+                    engine=engine_name,
+                    prompt=prompt,
+                    max_tokens=min(tokens_per_request, (num_notes - len(notation)) * 5),
+                    n=1,
+                    stop=None,
+                    temperature=temperature,
+                )
+                new_notation = response.choices[0].text.strip().split('\n')
+            else:
+                response = openai.ChatCompletion.create(
+                    model=engine_name,
+                    messages=[{"role": "system", "content": "You are a music generator AI."},
+                              {"role": "user", "content": prompt}],
+                    max_tokens=min(tokens_per_request, (num_notes - len(notation)) * 5),
+                    n=1,
+                    stop=None,
+                    temperature=temperature,
+                )
+                new_notation = response.choices[0]['message']['content'].strip().split('\n')
 
-        notation.extend(new_notation)
+            notation.extend(new_notation)
+
+        except Exception as e:
+            logging.error(f"An error occurred while generating music notation: {e}")
+            raise e
 
     # Truncate the notation to the desired number of notes
     notation = notation[:num_notes]
 
     return notation
-
-
 def notation_to_midi(notations, output_file, instrument_names):
+    """
+    Convert the generated music notation into a MIDI file.
+    """
     midi = pretty_midi.PrettyMIDI()
 
     for notation, instrument_name in zip(notations, instrument_names):
@@ -69,13 +89,13 @@ def notation_to_midi(notations, output_file, instrument_names):
             try:
                 split_line = line.split()
                 if len(split_line) < 2:
-                    print(f"Skipping line due to insufficient elements: {line}")
+                    logging.warning(f"Skipping line due to insufficient elements: {line}")
                     continue
 
                 duration = round(4 * float(fractions.Fraction(split_line[0])))
 
                 if duration == 0:
-                    print(f"Skipping line due to zero duration: {line}")
+                    logging.warning(f"Skipping line due to zero duration: {line}")
                     continue
 
                 pitches = [pretty_midi.note_name_to_number(pitch) for pitch in split_line[1:]]
@@ -86,6 +106,15 @@ def notation_to_midi(notations, output_file, instrument_names):
 
                 time += (4 / duration)
             except ValueError:
-                print(f"Skipping line: {line}")
+                logging.error(f"Skipping line due to ValueError: {line}")
+                continue
+            except Exception as e:
+                logging.error(f"An unexpected error occurred while processing line: {e}")
+                raise e
 
-    midi.write(output_file)
+    try:
+        midi.write(output_file)
+    except Exception as e:
+        logging.error(f"An error occurred while writing the MIDI file: {e}")
+        raise e
+
