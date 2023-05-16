@@ -18,9 +18,6 @@ def get_instruments():
     instruments = [{"id": index, "name": name} for index, name in enumerate(pretty_midi.INSTRUMENT_MAP)]
     return jsonify(instruments)
 
-
-
-
 @app.route('/generate-midi', methods=['POST'])
 def generate_midi():
     data = request.get_json()
