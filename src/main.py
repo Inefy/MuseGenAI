@@ -27,7 +27,8 @@ def generate_music_notation(engine_name, prompt, num_notes, temperature, instrum
     notations = []
     for instrument_name in instruments:
         instrument_prompt = f"{prompt} {instrument_name}:"
-        notation = _generate_music_notation(engine_name, instrument_prompt, num_notes, temperature)
+        notation = _generate_music_notation(
+            engine_name, instrument_prompt, num_notes, temperature)
         notations.append(notation)
     return notations
 
@@ -36,7 +37,8 @@ def _generate_music_notation(engine_name, prompt, num_notes, temperature):
     Generate music notation using the OpenAI API.
     """
     notation = []
-    tokens_per_request = 1000  # Adjust this value based on the maximum tokens you want to request in one call
+    # Adjust this value based on the maximum tokens you want to request in one call
+    tokens_per_request = 1000
 
     while len(notation) < num_notes:
         try:
@@ -44,7 +46,8 @@ def _generate_music_notation(engine_name, prompt, num_notes, temperature):
                 response = openai.Completion.create(
                     engine=engine_name,
                     prompt=prompt,
-                    max_tokens=min(tokens_per_request, (num_notes - len(notation)) * 5),
+                    max_tokens=min(tokens_per_request,
+                                   (num_notes - len(notation)) * 5),
                     n=1,
                     stop=None,
                     temperature=temperature,
@@ -55,7 +58,8 @@ def _generate_music_notation(engine_name, prompt, num_notes, temperature):
                     model=engine_name,
                     messages=[{"role": "system", "content": "You are a music generator AI."},
                               {"role": "user", "content": prompt}],
-                    max_tokens=min(tokens_per_request, (num_notes - len(notation)) * 5),
+                    max_tokens=min(tokens_per_request,
+                                   (num_notes - len(notation)) * 5),
                     n=1,
                     stop=None,
                     temperature=temperature,
@@ -65,13 +69,15 @@ def _generate_music_notation(engine_name, prompt, num_notes, temperature):
             notation.extend(new_notation)
 
         except Exception as e:
-            logging.error(f"An error occurred while generating music notation: {e}")
+            logging.error(
+                f"An error occurred while generating music notation: {e}")
             raise e
 
     # Truncate the notation to the desired number of notes
     notation = notation[:num_notes]
 
     return notation
+
 def notation_to_midi(notations, output_file, instrument_names):
     """
     Convert the generated music notation into a MIDI file.
@@ -80,7 +86,8 @@ def notation_to_midi(notations, output_file, instrument_names):
 
     for notation, instrument_name in zip(notations, instrument_names):
         cleaned_instrument_name = clean_instrument_name(instrument_name)
-        instrument_program = pretty_midi.instrument_name_to_program(cleaned_instrument_name)
+        instrument_program = pretty_midi.instrument_name_to_program(
+            cleaned_instrument_name)
         instrument = pretty_midi.Instrument(program=instrument_program)
         midi.instruments.append(instrument)
 
@@ -89,27 +96,31 @@ def notation_to_midi(notations, output_file, instrument_names):
             try:
                 split_line = line.split()
                 if len(split_line) < 2:
-                    logging.warning(f"Skipping line due to insufficient elements: {line}")
+                    logging.warning(
+                        f"Skipping line due to insufficient elements: {line}")
                     continue
 
                 duration = round(4 * float(fractions.Fraction(split_line[0])))
-
+                
                 if duration == 0:
-                    logging.warning(f"Skipping line due to zero duration: {line}")
+                    logging.warning(
+                        f"Skipping line due to zero duration: {line}")
                     continue
+            
 
-                pitches = [pretty_midi.note_name_to_number(pitch) for pitch in split_line[1:]]
+                pitches = [pretty_midi.note_name_to_number(
+                    pitch) for pitch in split_line[1:]]
 
                 for pitch in pitches:
-                    note_on = pretty_midi.Note(velocity=64, pitch=pitch, start=time, end=time + (4 / duration))
+                    note_on = pretty_midi.Note(
+                        velocity=100, pitch=pitch, start=time, end=time + duration)
                     instrument.notes.append(note_on)
 
-                time += (4 / duration)
-            except ValueError:
-                logging.error(f"Skipping line due to ValueError: {line}")
-                continue
+                time += duration
+
             except Exception as e:
-                logging.error(f"An unexpected error occurred while processing line: {e}")
+                logging.error(
+                    f"An error occurred while converting notation to MIDI: {e}")
                 raise e
 
     try:
@@ -117,4 +128,3 @@ def notation_to_midi(notations, output_file, instrument_names):
     except Exception as e:
         logging.error(f"An error occurred while writing the MIDI file: {e}")
         raise e
-

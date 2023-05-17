@@ -21,6 +21,10 @@ CORS(app)
 # Set the logging level
 logging.basicConfig(level=logging.INFO)
 
+@app.route('/', methods=['GET'])
+def home():
+    return "Welcome to my Flask application!"
+
 @app.route('/instruments', methods=['GET'])
 def get_instruments():
     """
