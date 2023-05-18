@@ -1,70 +1,71 @@
-# Getting Started with Create React App
+# MuseGenAI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+MuseGenAI is a Music Generator powered by GPT-4 and GPT-3-turbo from OpenAI. This application is designed to create a MIDI file based on a chosen musical style, genre, instruments, the number of notes, and the creativity level defined by the temperature parameter. 
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- Selection of AI engine: GPT-4 and GPT-3 Turbo.
+- Input of musical style, genre, and the number of notes to be generated.
+- Multi-selection of instruments from a comprehensive list.
+- Adjustable creativity level via the temperature slider.
+- Generation of a MIDI file, which can be downloaded and played in the application.
 
-### `npm start`
+## Setup and Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Clone the repository:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+   ```
+   git clone https://github.com/your-repo/musegenai.git
+   cd musegenai
+   ```
 
-### `npm test`
+2. Install the required Python libraries:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```
+   pip install -r requirements.txt
+   ```
 
-### `npm run build`
+3. Install Node.js dependencies:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   ```
+   cd client
+   npm install
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Create a `.env` file in the root directory and fill in your OpenAI API key:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+   ```
+   API_KEY=<Your OpenAI API Key>
+   ```
 
-### `npm run eject`
+## Running the application
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Start the Flask backend:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```
+   python app.py
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. In another terminal, navigate to the `client` folder and start the React frontend:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+   ```
+   npm start
+   ```
 
-## Learn More
+The application should now be running on `localhost:3000`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Usage
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Select the AI engine you want to use.
+2. Enter the desired musical style and genre.
+3. Select the instruments you want to include.
+4. Input the number of notes to be generated.
+5. Adjust the creativity level using the temperature slider.
+6. Click on 'Generate MIDI' to create the MIDI file.
+7. Once the MIDI file is generated, you can download it and it will also be played automatically in the application.
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## License
 
-### Analyzing the Bundle Size
+This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md) file for details.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
