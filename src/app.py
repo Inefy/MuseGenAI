@@ -56,7 +56,8 @@ def generate_midi():
 
         notations = []
         for instrument in data['instruments']:
-            prompt = f"Generate a {data['style']} {data['genre']} {instrument} song with individual notes and chords. Provide the melody in the following format: 'duration pitch1 pitch2 ...', with each note or chord on a separate line."
+            prompt = f"Generate a {data['style']} {data['genre']} {instrument} song with individual notes and chords. Provide the melody in the following format: 'duration pitch1 octave1 pitch2 octave2 ...', with each note or chord on a separate line. For example: '0.5 C4 0.5 E4'."
+
 
             notation = main.generate_music_notation(
                 engine_name,

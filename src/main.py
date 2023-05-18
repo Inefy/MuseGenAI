@@ -56,7 +56,7 @@ def _generate_music_notation(engine_name, prompt, num_notes, temperature):
             else:
                 response = openai.ChatCompletion.create(
                     model=engine_name,
-                    messages=[{"role": "system", "content": "You are a music generator AI."},
+                    messages=[{"role": "system", "content": "You are a music generator AI. I need you to generate musical notation. Each line should be in the format 'duration pitch1 pitch2 ...', with each note or chord on a separate line. Duration is a fractional value representing the length of the note or chord, and each pitch represents a note to be played simultaneously for chords. Here's an example: '0.5 C4 E4 G4'. That would represent a C Major chord played for half the duration of a full note."},
                               {"role": "user", "content": prompt}],
                     max_tokens=min(tokens_per_request,
                                    (num_notes - len(notation)) * 5),
@@ -65,6 +65,9 @@ def _generate_music_notation(engine_name, prompt, num_notes, temperature):
                     temperature=temperature,
                 )
                 new_notation = response.choices[0]['message']['content'].strip().split('\n')
+
+            # Only keep lines that have the correct format
+            new_notation = [line for line in new_notation if re.match(r'^\d+(\.\d+)?\s+([A-G]#?[0-9]\s*)+$', line)]
 
             notation.extend(new_notation)
 
@@ -77,6 +80,7 @@ def _generate_music_notation(engine_name, prompt, num_notes, temperature):
     notation = notation[:num_notes]
 
     return notation
+
 
 def notation_to_midi(notations, output_file, instrument_names):
     """
