@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
+import ReactPlayer from 'react-player';
 import { Container, Box, Typography, TextField, Select, MenuItem, FormControl, InputLabel, Slider, Button, Checkbox, ListItemText } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import styled from "@emotion/styled";
@@ -38,8 +39,9 @@ function App() {
   const [instruments, setInstruments] = useState([]);
   const [numNotes, setNumNotes] = useState("");
   const [temperature, setTemperature] = useState(0.5);
-
   const [instrumentsList, setInstrumentsList] = useState([]);
+  const [midiUrl, setMidiUrl] = useState(null);
+
 
   useEffect(() => {
     const fetchInstruments = async () => {
@@ -50,10 +52,9 @@ function App() {
 
     fetchInstruments();
   }, []);
-
   const generateMidi = async () => {
     const apiUrl = "http://localhost:5000/generate-midi";
-
+  
     const response = await axios.post(apiUrl, {
       engine,
       style,
@@ -62,7 +63,7 @@ function App() {
       num_notes: numNotes,
       temperature,
     });
-
+  
     // Download the MIDI file
     const blob = new Blob([response.data], { type: "audio/midi" });
     const url = window.URL.createObjectURL(blob);
@@ -72,6 +73,9 @@ function App() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  
+    // Set the URL for ReactPlayer
+    setMidiUrl(url);
   };
 
   return (
@@ -136,6 +140,11 @@ function App() {
             Generate MIDI
           </Button>
         </Box>
+        {midiUrl && (
+          <Box width="100%" mb={3}>
+            <ReactPlayer url={midiUrl} controls={true} />
+          </Box>
+        )}
       </AppContainer>
     </ThemeProvider>
   );

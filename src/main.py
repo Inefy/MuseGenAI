@@ -1,7 +1,7 @@
-import openai
 import config
 import pretty_midi
 import fractions
+import openai
 import re
 import logging
 
