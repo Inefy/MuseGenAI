@@ -92,36 +92,40 @@ def notation_to_midi(notations, output_file, instrument_names):
         midi.instruments.append(instrument)
 
         time = 0
-        for line in notation:
-            try:
-                split_line = line.split()
-                if len(split_line) < 2:
-                    logging.warning(
-                        f"Skipping line due to insufficient elements: {line}")
-                    continue
+        for sub_notation in notation:
+            for line in sub_notation:
+                try:
+                    split_line = line.split()
+                    if len(split_line) < 2:
+                        logging.warning(
+                            f"Skipping line due to insufficient elements: {line}")
+                        continue
 
-                duration = round(4 * float(fractions.Fraction(split_line[0])))
-                
-                if duration == 0:
-                    logging.warning(
-                        f"Skipping line due to zero duration: {line}")
-                    continue
-            
+                    try:
+                        duration = round(4 * float(fractions.Fraction(split_line[0])))
+                    except ValueError:
+                        logging.warning(f"Skipping line due to non-numeric duration: {line}")
+                        continue
 
-                pitches = [pretty_midi.note_name_to_number(
-                    pitch) for pitch in split_line[1:]]
+                    if duration == 0:
+                        logging.warning(
+                            f"Skipping line due to zero duration: {line}")
+                        continue
 
-                for pitch in pitches:
-                    note_on = pretty_midi.Note(
-                        velocity=100, pitch=pitch, start=time, end=time + duration)
-                    instrument.notes.append(note_on)
+                    pitches = [pretty_midi.note_name_to_number(
+                        pitch) for pitch in split_line[1:]]
 
-                time += duration
+                    for pitch in pitches:
+                        note_on = pretty_midi.Note(
+                            velocity=100, pitch=pitch, start=time, end=time + duration)
+                        instrument.notes.append(note_on)
 
-            except Exception as e:
-                logging.error(
-                    f"An error occurred while converting notation to MIDI: {e}")
-                raise e
+                    time += duration
+
+                except Exception as e:
+                    logging.error(
+                        f"An error occurred while converting notation to MIDI: {e}")
+                    raise e
 
     try:
         midi.write(output_file)
